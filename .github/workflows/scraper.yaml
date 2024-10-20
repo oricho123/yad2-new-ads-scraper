@@ -9,7 +9,8 @@ on:
 
 jobs:
   scraper:
-    runs-on: ubuntu-22.04 # Updated to a specific version for consistency and possibly lower cost
+    name: scraper
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
@@ -17,9 +18,7 @@ jobs:
         uses: actions/checkout@v4 # Updated to the latest stable version
 
       - name: Install Bun
-        run: |
-          curl -fsSL https://bun.sh/install | bash
-          echo "Bun installed successfully."
+      - uses: oven-sh/setup-bun@v2
 
       - name: Cache Bun dependencies
         uses: actions/cache@v3
@@ -45,7 +44,7 @@ jobs:
           API_TOKEN: ${{ secrets.API_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: |
-          ~/.bun/bin/bun run scrape
+          ~/.bun/bin/bun run start
           echo "Scraper run completed successfully."
 
       - name: Push new JSON data if needed
