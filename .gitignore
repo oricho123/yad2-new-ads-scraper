@@ -173,7 +173,7 @@ dist
 
 localTests.js
 
-push_me
+/push_me
 .env
 # Finder (MacOS) folder config
 .DS_Store
