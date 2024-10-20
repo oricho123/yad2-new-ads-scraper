@@ -3,7 +3,7 @@ name: Scraper Workflow
 on:
   push:
     branches:
-      - testing
+      - main
   workflow_dispatch:
 
 jobs:
@@ -15,27 +15,25 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-        run: echo "Checked out the repository"
 
       - name: Install Bun
         run: |
           echo "Installing Bun..."
           curl -fsSL https://bun.sh/install | bash
-        run: echo "Bun installation completed"
+          echo "Bun installation completed"
 
       - name: Cache Dependencies
         uses: actions/cache@v3
         with:
           path: node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('**/package.json') }}
-        run: echo "Caching dependencies"
 
       - name: Setup Git Configuration
         run: |
           echo "Setting up Git Configuration..."
           git config --global user.name "GitHub Actions"
           git config --global user.email "${{ secrets.GIT_CONFIG_EMAIL }}"
-        run: echo "Git configuration completed"
+          echo "Git configuration completed"
 
       - name: Run Bun Start
         env:
@@ -44,7 +42,7 @@ jobs:
         run: |
           echo "Running Bun Start..."
           bun start
-        run: echo "Bun script execution completed"
+          echo "Bun script execution completed"
 
       - name: Check for push_me and Push Changes
         if: success() && ("${{ github.workspace }}/push_me" != '')
