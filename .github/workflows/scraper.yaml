@@ -2,7 +2,7 @@ name: Yad2 Scraper
 
 on:
   schedule:
-    - cron: '*/5 5-20 * * *' # Run every half hour between 08:00-23:00 Israel Time (UTC 5:00-20:00)
+    - cron: "*/5 5-20 * * *" # Run every half hour between 08:00-23:00 Israel Time (UTC 5:00-20:00)
   workflow_dispatch:
     branches:
       - "**"
@@ -25,12 +25,14 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.bun/install/cache/v*
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
       - name: Install dependencies using Bun
-        run: ~/.bun/bin/bun install
+        run: |
+          ~/.bun/bin/bun install
+          echo "Dependencies installed successfully."
 
       - name: Setup git config
         run: |
@@ -38,6 +40,7 @@ jobs:
           git config user.email "${{ secrets.GIT_CONFIG_EMAIL }}"
 
       - name: Run scraper
+        id: scraper # Added ID to reference this step in the following steps
         env:
           API_TOKEN: ${{ secrets.API_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
