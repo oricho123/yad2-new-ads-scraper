@@ -1,4 +1,4 @@
-name: Yad2 Scraper
+name: Scraper Workflow
 
 on:
   schedule:
@@ -8,34 +8,48 @@ on:
       - '**'
 
 jobs:
-  scraper:
+  run-scraper:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      - name: Install packages
-        run: yarn install
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
 
-      - name: Setup git config
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/package.json') }}
+
+      - name: Setup Git Configuration
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "${{ secrets.GIT_CONFIG_EMAIL }}"
+          echo "Setting up Git Configuration..."
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "${{ secrets.GIT_CONFIG_EMAIL }}"
+          echo "Git configuration completed"
 
-      - name: Run scraper
+      - name: Run Bun Start
+        env:
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
         run: |
-          export API_TOKEN=${{ secrets.API_TOKEN }}
-          export CHAT_ID=${{ secrets.CHAT_ID }}
-          yarn scrape
+          echo "Running Bun Start..."
+          bun start
+          echo "Bun script execution completed"
 
-      - name: Push new json data if needed
+      - name: Check for push_me and Push Changes
+        if: success() && ("${{ github.workspace }}/push_me" != '')
         run: |
-          if [ -f ./push_me ]; then
-            echo Pushing to Github...
-            git add .
-            DATE=$(date +"%F, %H:%M:%S")
-            git commit -m "updated data - $DATE"
-            git push
-          fi
+          echo "push_me file detected, proceeding with Git operations..."
+          git add .
+          DATE=$(date)
+          git commit -m "updated data - $DATE"
+          git push
