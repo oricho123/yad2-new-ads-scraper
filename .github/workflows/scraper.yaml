@@ -49,8 +49,12 @@ jobs:
       - name: Check for push_me and Push Changes
         if: success() && ("${{ github.workspace }}/push_me" != '')
         run: |
-          echo "push_me file detected, proceeding with Git operations..."
-          git add .
-          DATE=$(date)
-          git commit -m "updated data - $DATE"
-          git push
+          if [ -f "${{ github.workspace }}/push_me" ]; then
+            echo "push_me file detected, proceeding with Git operations..."
+            git add .
+            DATE=$(date)
+            git commit -m "updated data - $DATE"
+            git push
+          else
+            echo "push_me file not found. Skipping Git operations."
+          fi
