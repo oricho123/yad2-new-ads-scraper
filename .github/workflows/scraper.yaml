@@ -1,60 +1,56 @@
-name: Yad2 Scraper
+name: Scraper Workflow
 
 on:
-  schedule:
-    - cron: "*/5 5-20 * * *" # Run every half hour between 08:00-23:00 Israel Time (UTC 5:00-20:00)
-  workflow_dispatch:
+  push:
     branches:
-      - "**"
+      - main
+  workflow_dispatch:
 
 jobs:
-  scraper:
-    name: scraper
+  run-scraper:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4 # Updated to the latest stable version
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+        run: echo "Checked out the repository"
 
       - name: Install Bun
-      - uses: oven-sh/setup-bun@v2
+        run: |
+          echo "Installing Bun..."
+          curl -fsSL https://bun.sh/install | bash
+        run: echo "Bun installation completed"
 
-      - name: Cache Bun dependencies
+      - name: Cache Dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
+          path: node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/package.json') }}
+        run: echo "Caching dependencies"
 
-      - name: Install dependencies using Bun
+      - name: Setup Git Configuration
         run: |
-          ~/.bun/bin/bun install
-          echo "Dependencies installed successfully."
+          echo "Setting up Git Configuration..."
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "${{ secrets.GIT_CONFIG_EMAIL }}"
+        run: echo "Git configuration completed"
 
-      - name: Setup git config
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "${{ secrets.GIT_CONFIG_EMAIL }}"
-
-      - name: Run scraper
-        id: scraper # Added ID to reference this step in the following steps
+      - name: Run Bun Start
         env:
           API_TOKEN: ${{ secrets.API_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: |
-          ~/.bun/bin/bun run start
-          echo "Scraper run completed successfully."
+          echo "Running Bun Start..."
+          bun start
+        run: echo "Bun script execution completed"
 
-      - name: Push new JSON data if needed
-        if: success() && steps.scraper.outcome == 'success' # Only run if previous steps were successful
+      - name: Check for push_me and Push Changes
+        if: success() && ("${{ github.workspace }}/push_me" != '')
         run: |
-          if [ -f ./push_me ]; then
-            echo "Changes detected, pushing to GitHub..."
-            git add .
-            DATE=$(date +"%F, %H:%M:%S")
-            git commit -m "updated data - $DATE"
-            git push
-          else
-            echo "No changes to push."
+          echo "push_me file detected, proceeding with Git operations..."
+          git add .
+          DATE=$(date)
+          git commit -m "updated data - $DATE"
+          git push
