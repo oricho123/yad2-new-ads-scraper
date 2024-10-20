@@ -2,22 +2,35 @@ name: Yad2 Scraper
 
 on:
   schedule:
-    - cron: '*/5 5-20 * * *'
+    - cron: '*/5 5-20 * * *' # Run every half hour between 08:00-23:00 Israel Time (UTC 5:00-20:00)
   workflow_dispatch:
     branches:
-      - '**'
+      - "**"
 
 jobs:
   scraper:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 # Updated to a specific version for consistency and possibly lower cost
     permissions:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Updated to the latest stable version
 
-      - name: Install packages
-        run: yarn install
+      - name: Install Bun
+        run: |
+          curl -fsSL https://bun.sh/install | bash
+          echo "Bun installed successfully."
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.bun/install/cache/v*
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies using Bun
+        run: ~/.bun/bin/bun install
 
       - name: Setup git config
         run: |
@@ -25,17 +38,21 @@ jobs:
           git config user.email "${{ secrets.GIT_CONFIG_EMAIL }}"
 
       - name: Run scraper
+        env:
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
         run: |
-          export API_TOKEN=${{ secrets.API_TOKEN }}
-          export CHAT_ID=${{ secrets.CHAT_ID }}
-          yarn scrape
+          ~/.bun/bin/bun run scrape
+          echo "Scraper run completed successfully."
 
-      - name: Push new json data if needed
+      - name: Push new JSON data if needed
+        if: success() && steps.scraper.outcome == 'success' # Only run if previous steps were successful
         run: |
           if [ -f ./push_me ]; then
-            echo Pushing to Github...
+            echo "Changes detected, pushing to GitHub..."
             git add .
             DATE=$(date +"%F, %H:%M:%S")
             git commit -m "updated data - $DATE"
             git push
-          fi
+          else
+            echo "No changes to push."
