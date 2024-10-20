@@ -1,14 +1,20 @@
 {
-  "name": "yad2-scraper",
-  "version": "1.0.0",
-  "main": "index.js",
-  "author": "Niv Ezra",
-  "license": "MIT",
+  "name": "quickstart",
+  "module": "index.ts",
+  "type": "module",
   "scripts": {
-    "scrape": "node scraper.js"
+    "start": "bun run index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
   },
   "dependencies": {
-    "cheerio": "^1.0.0-rc.12",
-    "telenode-js": "^1.1.5"
+    "cheerio": "^1.0.0",
+    "node-fetch": "^3.3.2",
+    "p-limit": "^6.1.0",
+    "telenode-js": "^1.5.2"
   }
 }
