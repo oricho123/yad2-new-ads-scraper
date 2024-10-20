@@ -107,13 +107,10 @@ const scrapeItemsAndExtractAdDetails = async (url: string): Promise<any[]> => {
   const adDetails: Record<string, string>[] = [];
   $feedItems.each((_, elm) => {
     const imageUrl = $(elm).find("img[data-testid='image']").attr("src");
-    const address = $(elm).find(".item-data-content_heading__tphH4").text().trim();
-    const description = $(elm)
-      .find(".item-data-content_itemInfoLine__AeoPP.item-data-content_first__oi7xM")
-      .text()
-      .trim();
-    const structure = $(elm).find(".item-data-content_itemInfoLine__AeoPP").eq(1).text().trim();
-    const price = $(elm).find(".price_price__xQt90").text().trim();
+    const address = $(elm).find("[class^=item-data-content_heading]").eq(1).text().trim();
+    const description = $(elm).find("[class^='item-data-content_itemInfoLine']").first().text().trim();
+    const structure = $(elm).find("[class^=item-data-content_itemInfoLine]").eq(1).text().trim();
+    const price = $(elm).find("[class^=price_price]").text().trim();
 
     adDetails.push({
       imageUrl: imageUrl || "",
