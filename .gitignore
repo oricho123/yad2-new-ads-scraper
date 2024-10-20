@@ -4,3 +4,4 @@ node_modules
 localTests.js
 
 push_me
+.env
