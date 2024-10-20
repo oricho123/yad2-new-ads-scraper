@@ -24,8 +24,8 @@ jobs:
       - name: Cache Bun dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.bun/install/cache/v*
-          key: ${{ runner.os }}-bun-${{ hashFiles('yarn.lock') }}
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
@@ -59,4 +59,4 @@ jobs:
             git push
           else
             echo "No changes to push."
-        shell: bash
+        shell: bash -l
