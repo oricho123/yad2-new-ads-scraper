@@ -58,4 +58,3 @@ jobs:
             git push
           else
             echo "No changes to push."
-        shell: bash -l
