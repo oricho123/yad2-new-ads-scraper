@@ -111,8 +111,16 @@ const scrapeItemsAndExtractAdDetails = async (url: string): Promise<any[]> => {
     const description = $(elm).find("[class^='item-data-content_itemInfoLine']").first().text().trim();
     const structure = $(elm).find("[class^=item-data-content_itemInfoLine]").eq(1).text().trim();
     const price = $(elm).find("[class^=price_price]").text().trim();
+    const relativeLink = $(elm).find('a[class^="item-layout_itemLink"]').attr("href");
+
+    let fullLink = "";
+    if (relativeLink) {
+      const baseUrl = "https://www.yad2.co.il";
+      fullLink = `${baseUrl}${relativeLink}`;
+    }
 
     adDetails.push({
+      fullLink: fullLink || "",
       imageUrl: imageUrl || "",
       address,
       description,
@@ -240,13 +248,12 @@ const scrape = async (topic: string, url: string): Promise<void> => {
   }
 
   try {
-    await sendTelegramMessage(chatId, `Starting scanning ${topic} on link:\n${url}`, apiToken);
     console.log(`Sent start message for topic: ${topic}`);
     const scrapeResults = await scrapeItemsAndExtractAdDetails(url);
     const newItems = await checkForNewItems(scrapeResults, topic);
     if (newItems.length > 0) {
       for (const item of newItems) {
-        const msg = `${item.address}\n${item.description}\n${item.structure}\n${item.price}`;
+        const msg = `${item.address}\n${item.description}\n${item.structure}\n${item.price}\n\n${item.fullLink}`;
         if (item.imageUrl) {
           await sendTelegramPhotoMessage(chatId, item.imageUrl, msg, apiToken);
         } else {
@@ -255,7 +262,6 @@ const scrape = async (topic: string, url: string): Promise<void> => {
         console.log(`Sent new item to chatId: ${chatId}`);
       }
     } else {
-      await sendTelegramMessage(chatId, "No new items were added", apiToken);
       console.log(`No new items found for topic: ${topic}`);
     }
   } catch (e: any) {
