@@ -4,7 +4,7 @@
   "projects": [
     {
       "topic": "modiin",
-      "url": "https://www.yad2.co.il/realestate/rent?topArea=2&area=8&city=1200&propertyGroup=apartments&property=1%2C3%2C6%2C7&rooms=3-4&price=5000-7000&imageOnly=1&priceOnly=1&parking=1&elevator=1&balcony=1&shelter=1&zoom=13"
+      "url": "https://www.yad2.co.il/realestate/rent?minPrice=6000&maxPrice=11000&minRooms=4.5&maxRooms=5.5&imageOnly=1&priceOnly=1&property=1%2C3%2C5%2C7%2C39%2C51&parking=1&elevator=1&balcony=1&shelter=1&topArea=2&area=8&city=1200"
     }
   ]
 }
