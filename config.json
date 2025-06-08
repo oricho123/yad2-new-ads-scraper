@@ -3,8 +3,8 @@
   "chatId": null,
   "projects": [
     {
-      "topic": "modiin",
-      "url": "https://www.yad2.co.il/realestate/rent?minPrice=6000&maxPrice=11000&minRooms=4.5&maxRooms=5.5&imageOnly=1&priceOnly=1&property=1%2C3%2C5%2C7%2C39%2C51&parking=1&elevator=1&balcony=1&shelter=1&topArea=2&area=8&city=1200"
+      "topic": "kiryatBialik1",
+      "url": "https://www.yad2.co.il/realestate/forsale?minPrice=700000&maxPrice=1360000&priceOnly=1&topArea=25&area=6&city=9500"
     }
   ]
 }
