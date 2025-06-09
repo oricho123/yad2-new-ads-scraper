@@ -106,7 +106,11 @@ const scrapeItemsAndExtractAdDetails = async (url: string): Promise<any[]> => {
   // Extract ad details dynamically, accounting for different potential structures
   const adDetails: Record<string, string>[] = [];
   $feedItems.each((_, elm) => {
-    const imageUrl = $(elm).find("img[data-testid='image']").attr("src");
+    let imageUrl = $(elm).find("img[data-testid='image']").attr("src");
+      // Skip SVG images
+    if (imageUrl && imageUrl.trim().toLowerCase().endsWith('.svg')) {
+      imageUrl = undefined;
+    }
     const address = $(elm).find("[class^=item-data-content_heading]").eq(1).text().trim();
     const description = $(elm).find("[class^='item-data-content_itemInfoLine']").first().text().trim();
     const structure = $(elm).find("[class^=item-data-content_itemInfoLine]").eq(1).text().trim();
