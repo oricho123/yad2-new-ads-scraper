@@ -114,7 +114,7 @@ const scrapeItemsAndExtractAdDetails = async (url: string): Promise<any[]> => {
     const address = $(elm).find("[class^=item-data-content_heading]").eq(1).text().trim();
     const description = $(elm).find("[class^='item-data-content_itemInfoLine']").first().text().trim();
     const structure = $(elm).find("[class^=item-data-content_itemInfoLine]").eq(1).text().trim();
-    const price = $(elm).find("[class^=price_price]").text().trim();
+    const price = $(elm).find("[class^=feed-item-price_price]").text().trim();
     const relativeLink = $(elm).find('a[class^="item-layout_itemLink"]').attr("href");
 
     let fullLink = "";
