@@ -227,9 +227,14 @@ const sendTelegramPhotoMessage = async (
       },
       body: JSON.stringify(payload),
     });
+    
     if (!response.ok) {
-      throw new Error(`Failed to send photo message: ${response.statusText}`);
+      const errorDetails = await response.text();
+      throw new Error(
+        `Failed to send photo message, with status: ${response.status} - ${response.statusText}. Details: ${errorDetails}`
+      );
     }
+
     console.log(`Photo message sent successfully to chatId: ${chatId}`);
   } catch (error) {
     console.error("Error sending photo via Telegram API", error);
