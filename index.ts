@@ -26,7 +26,11 @@ const userAgents = [
 
 // Utility functions
 // Function to fetch HTML response from Yad2 with retry mechanism, backoff strategy, and maximum timeout
-const getYad2Response = async (url: string, retries = 3, maxTimeout = 10000): Promise<string> => {
+const getYad2Response = async (
+  url: string,
+  retries = 3,
+  maxTimeout = 10000
+): Promise<string> => {
   console.log(`Fetching URL: ${url}, Retries left: ${retries}`);
   const requestOptions = {
     method: "GET",
@@ -35,7 +39,8 @@ const getYad2Response = async (url: string, retries = 3, maxTimeout = 10000): Pr
       "User-Agent": userAgents[Math.floor(Math.random() * userAgents.length)],
       "Accept-Language": "en-US,en;q=0.9",
       Referer: "https://www.yad2.co.il/",
-      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
     },
   };
 
@@ -52,8 +57,12 @@ const getYad2Response = async (url: string, retries = 3, maxTimeout = 10000): Pr
 
       const res = await fetch(url, requestOptions);
       if (!res.ok) {
-        console.error(`Fetch failed with status: ${res.status} ${res.statusText}`);
-        throw new Error(`Failed to fetch Yad2: ${res.status} ${res.statusText}`);
+        console.error(
+          `Fetch failed with status: ${res.status} ${res.statusText}`
+        );
+        throw new Error(
+          `Failed to fetch Yad2: ${res.status} ${res.statusText}`
+        );
       }
       console.log(`Successfully fetched URL: ${url}`);
       return await res.text();
@@ -65,7 +74,9 @@ const getYad2Response = async (url: string, retries = 3, maxTimeout = 10000): Pr
         throw new Error("Network error occurred after multiple retries");
       }
       const delay = backoffDelay(3 - retries);
-      console.log(`Retrying... (${3 - retries} attempts left, waiting for ${delay}ms)`);
+      console.log(
+        `Retrying... (${3 - retries} attempts left, waiting for ${delay}ms)`
+      );
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
@@ -86,7 +97,10 @@ const scrapeItemsAndExtractAdDetails = async (url: string): Promise<any[]> => {
   }
 
   // Define possible selectors for feed items to make the scraper resilient to HTML changes
-  const possibleSelectors = ["[data-testid='item-basic']"];
+  const possibleSelectors = [
+    "[data-testid='item-basic']",
+    "[data-testid='agency-item']",
+  ];
   let $feedItems;
 
   // Attempt to find the feed items using different selectors
@@ -99,7 +113,9 @@ const scrapeItemsAndExtractAdDetails = async (url: string): Promise<any[]> => {
   }
 
   if (!$feedItems || !$feedItems.length) {
-    console.error("No feed items found on the page after trying multiple selectors");
+    console.error(
+      "No feed items found on the page after trying multiple selectors"
+    );
     throw new Error("Could not find feed items on the page");
   }
 
@@ -107,15 +123,29 @@ const scrapeItemsAndExtractAdDetails = async (url: string): Promise<any[]> => {
   const adDetails: Record<string, string>[] = [];
   $feedItems.each((_, elm) => {
     let imageUrl = $(elm).find("img[data-testid='image']").attr("src");
-      // Skip SVG images
-    if (imageUrl && imageUrl.trim().toLowerCase().endsWith('.svg')) {
+    // Skip SVG images
+    if (imageUrl && imageUrl.trim().toLowerCase().endsWith(".svg")) {
       imageUrl = undefined;
     }
-    const address = $(elm).find("[class^=item-data-content_heading]").eq(1).text().trim();
-    const description = $(elm).find("[class^='item-data-content_itemInfoLine']").first().text().trim();
-    const structure = $(elm).find("[class^=item-data-content_itemInfoLine]").eq(1).text().trim();
+    const address = $(elm)
+      .find("[class^=item-data-content_heading]")
+      .eq(1)
+      .text()
+      .trim();
+    const description = $(elm)
+      .find("[class^='item-data-content_itemInfoLine']")
+      .first()
+      .text()
+      .trim();
+    const structure = $(elm)
+      .find("[class^=item-data-content_itemInfoLine]")
+      .eq(1)
+      .text()
+      .trim();
     const price = $(elm).find("[class^=feed-item-price_price]").text().trim();
-    const relativeLink = $(elm).find('a[class^="item-layout_itemLink"]').attr("href");
+    const relativeLink = $(elm)
+      .find('a[class^="item-layout_itemLink"]')
+      .attr("href");
 
     let fullLink = "";
     if (relativeLink) {
@@ -150,14 +180,19 @@ const checkForNewItems = async (ads: any[], topic: string): Promise<any[]> => {
         savedAds = new Set(JSON.parse(data));
         console.log(`Loaded ${savedAds.size} saved ads for topic: ${topic}`);
       } catch (parseError) {
-        console.error("Error parsing saved ads, reverting to empty set", parseError);
+        console.error(
+          "Error parsing saved ads, reverting to empty set",
+          parseError
+        );
         savedAds = new Set<string>();
         // Optionally create a backup of the corrupted file
         await writeFile(`${filePath}.backup`, data);
         console.log(`Backup of corrupted data saved to ${filePath}.backup`);
       }
     } else {
-      console.log(`Data file for topic ${topic} does not exist. Creating new file.`);
+      console.log(
+        `Data file for topic ${topic} does not exist. Creating new file.`
+      );
       await mkdir("data", { recursive: true });
       await writeFile(filePath, "[]");
     }
@@ -184,7 +219,11 @@ const createPushFlagForWorkflow = async (): Promise<void> => {
 };
 
 // Function to send a message via Telegram API
-const sendTelegramMessage = async (chatId: string, text: string, apiToken: string): Promise<void> => {
+const sendTelegramMessage = async (
+  chatId: string,
+  text: string,
+  apiToken: string
+): Promise<void> => {
   const url = `https://api.telegram.org/bot${apiToken}/sendMessage`;
   const payload = {
     chat_id: chatId,
@@ -231,7 +270,7 @@ const sendTelegramPhotoMessage = async (
       },
       body: JSON.stringify(payload),
     });
-    
+
     if (!response.ok) {
       const errorDetails = await response.text();
       throw new Error(
@@ -275,7 +314,11 @@ const scrape = async (topic: string, url: string): Promise<void> => {
     }
   } catch (e: any) {
     const errMsg = e?.message || "Unknown error occurred";
-    await sendTelegramMessage(chatId, `Scan workflow failed... 😥\nError: ${errMsg}`, apiToken);
+    await sendTelegramMessage(
+      chatId,
+      `Scan workflow failed... 😥\nError: ${errMsg}`,
+      apiToken
+    );
     console.error("Error during scraping", e);
   }
 };
