@@ -5,14 +5,6 @@
     {
       "topic": "kiryatBialik1",
       "url": "https://www.yad2.co.il/realestate/forsale?minPrice=700000&maxPrice=1360000&priceOnly=1&topArea=25&area=6&city=9500"
-    },
-    {
-      "topic": "kiryatBialik2",
-      "url": "https://www.yad2.co.il/realestate/forsale?minPrice=700000&maxPrice=1360000&priceOnly=1&topArea=25&area=6&city=9500&page=2"
-    },
-    {
-      "topic": "kiryatBialik3",
-      "url": "https://www.yad2.co.il/realestate/forsale?minPrice=700000&maxPrice=1360000&priceOnly=1&topArea=25&area=6&city=9500&page=3"
     }
   ]
 }
